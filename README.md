@@ -1,1 +1,1 @@
-# frontendmasters_go_vanillajs
+# Frontendmasters Go VanillaJS
