@@ -1,1 +1,0 @@
-## Frontendmasters Go VanillaJS
