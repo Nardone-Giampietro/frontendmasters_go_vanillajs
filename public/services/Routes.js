@@ -5,14 +5,14 @@ import { MoviePage } from "../components/MoviePage.js";
 export const routes = [
     {
         path: "/",
-        componet: HomePage
+        component: HomePage
     },
     {
         path: /\/movies\/(\d+)/,
-        componet: MovieDetailsPage
+        component: MovieDetailsPage
     },
     {
         path: "/movies", // search result
-        componet: MoviePage
+        component: MoviePage
     }
 ]

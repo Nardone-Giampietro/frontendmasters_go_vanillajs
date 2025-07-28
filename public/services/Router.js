@@ -27,13 +27,13 @@ export const Router = {
         const routePath = route.includes('?') ? route.split('?')[0] : route;
         for (const r of routes) {
             if (typeof r.path === "string" && r.path === routePath) {
-                pageElement = new r.componet();
+                pageElement = new r.component();
                 break;
             } else if (r.path instanceof RegExp){
                 // Regular Expression
                 const match = r.path.exec(route);
                 if (match) {
-                    pageElement = new r.componet();
+                    pageElement = new r.component();
                     // Parameters
                     const params = match.slice(1);
                     pageElement.params = params;
