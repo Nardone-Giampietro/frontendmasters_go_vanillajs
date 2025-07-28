@@ -3,9 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>ReelingIt - Movies</title>
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="manifest" href="/app.webmanifest">
+    <link rel="icon" href="/images/icon.png" type="image/png">
+    <script src="/app.js" type="module" defer></script>
+    <base href="/">
 </head>
 <body>
-    <h1>Hello from Go!!!</h1>
+    <header>
+        <h1><img src="/images/logo.png" height="35" alt="ReelingIt"></h1>
+        <nav>
+            <ul>
+                <li><a class="navlink" href="/">Movies</a></li>
+                <li><a class="navlink" href="/account/favorites">Favorites</a></li>
+                <li><a class="navlink" href="/account/watchlist">Watchlist</a></li>
+                <li><a class="navlink" href="/account/">My Account</a></li>
+            </ul>
+        </nav>
+        <div>
+            <form onsubmit="app.search(event)">
+                <input type="search" name="search" placeholder="Search for movies..." >
+                <button type="submit">Search</button>
+            </form>
+        </div>
+    </header>
+    <main>
+
+    </main>
+
+    <!---  Templates  --->
+    <template id="template-home">
+        <section class="vertical-scroll" id="top-10">
+            <h2>This Week's Top Movies</h2>
+            <ul></ul>
+        </section>
+        <section class="vertical-scroll" id="random">
+            <h2>Something to watch today</h2>
+            <ul></ul>
+        </section>
+    </template>
+    <template id="template-movie-details">
+        <article id="movie">
+            <h2><animated-loading elements="2"></animated-loading></h2>
+            <h3></h3>
+            <header>
+                <img src="" alt="Poster">
+                <youtube-embed id="trailer" data-url=""></youtube-embed>
+                <section id="actions">
+                    <dl id="metadata">
+                    </dl>
+                    <button>Add to Favorites</button>
+                    <button>Add to Watchlist</button>    
+                </section>
+            </header>
+            <ul id="genres"></ul>
+            <p id="overview"></p>
+            <ul id="cast"></ul>
+        </article>
+    </template>
+    <footer>
+        <p>&copy; 2025 ReelingIt. All rights reserved.</p>
+        <p>Follow us on 
+            <a href="https://twitter.com/reelingit" target="_blank">Twitter</a>, 
+            <a href="https://facebook.com/reelingit" target="_blank">Facebook</a>, 
+            <a href="https://instagram.com/reelingit" target="_blank">Instagram</a>
+        </p>
+    </footer>
 </body>
 </html>

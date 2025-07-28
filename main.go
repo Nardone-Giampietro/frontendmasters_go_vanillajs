@@ -53,6 +53,19 @@ func main() {
 
 	http.HandleFunc("GET /api/movies/top", movieHandlers.GetTopMovies)
 	http.HandleFunc("GET /api/movies/random", movieHandlers.GetRandomMovies)
+	http.HandleFunc("GET /api/movies/search", movieHandlers.SearchMovies)
+	http.HandleFunc("GET /api/movies/", movieHandlers.GetMovie)
+	http.HandleFunc("GET /api/genres/", movieHandlers.GetGenres)
+
+	catchAllClientRouteshandler := func(w http.ResponseWriter, r *http.Request) {
+		// Si può fare una redirezione oppure inviare index.html
+		// Se faccio una redirect allora l'utente andrebbe sulla pagina principale ogni
+		// volta e non è la soluzione desiderata
+		http.ServeFile(w, r, "./public/index.html")
+	}
+	http.HandleFunc("/movies", catchAllClientRouteshandler)
+	http.HandleFunc("/movies/", catchAllClientRouteshandler)
+	http.HandleFunc("/account/", catchAllClientRouteshandler)
 
 	// Server the static folder public
 	http.Handle("/", http.FileServer(http.Dir("public")))

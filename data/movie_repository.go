@@ -119,9 +119,9 @@ func (r *MovieRepository) SearchMoviesByName(name string, order string, genre *i
 
 	genreFilter := ""
 	if genre != nil {
-		genreFilter = ` AND ((SELECT COUNT(*) FROM movie_genres 
+		genreFilter = ` AND  EXISTS (SELECT * FROM movie_genres 
 								WHERE movie_id=movies.id 
-								AND genre_id=` + strconv.Itoa(*genre) + `) = 1) `
+								AND genre_id=` + strconv.Itoa(*genre) + `)`
 	}
 
 	// Fetch movies by name
@@ -184,7 +184,8 @@ func (r *MovieRepository) fetchMovieRelations(m *models.Movie) error {
 	genreQuery := `
 		SELECT g.id, g.name 
 		FROM genres g
-		JOIN movie_genres mg ON g.id = mg.genre_id
+		JOIN movie_genres mg 
+			ON g.id = mg.genre_id
 		WHERE mg.movie_id = $1
 	`
 	genreRows, err := r.db.Query(genreQuery, m.ID)
@@ -206,7 +207,8 @@ func (r *MovieRepository) fetchMovieRelations(m *models.Movie) error {
 	actorQuery := `
 		SELECT a.id, a.first_name, a.last_name, a.image_url
 		FROM actors a
-		JOIN movie_cast mc ON a.id = mc.actor_id
+		JOIN movie_cast mc
+			ON a.id = mc.actor_id
 		WHERE mc.movie_id = $1
 	`
 	actorRows, err := r.db.Query(actorQuery, m.ID)
@@ -228,7 +230,8 @@ func (r *MovieRepository) fetchMovieRelations(m *models.Movie) error {
 	keywordQuery := `
 		SELECT k.word
 		FROM keywords k
-		JOIN movie_keywords mk ON k.id = mk.keyword_id
+		JOIN movie_keywords mk 
+			ON k.id = mk.keyword_id
 		WHERE mk.movie_id = $1
 	`
 	keywordRows, err := r.db.Query(keywordQuery, m.ID)
