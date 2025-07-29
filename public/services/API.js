@@ -16,8 +16,7 @@ export const API = {
         try {
             const queryString = args ? new URLSearchParams(args).toString : "";
             const response = await fetch(API.baseURL + ServiceName + queryString);
-            const result = await response.json();
-            return result
+            return await response.json()
         } catch (e) {
             console.error(e)
         }

@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"strconv"
 
@@ -28,7 +29,7 @@ func (h *MovieHandler) writeJSONResponse(w http.ResponseWriter, data interface{}
 
 func (h *MovieHandler) handleStorageError(w http.ResponseWriter, err error, context string) bool {
 	if err != nil {
-		if err == data.ErrMovieNotFound {
+		if errors.Is(err, data.ErrMovieNotFound) {
 			http.Error(w, context, http.StatusNotFound)
 			return true
 		}

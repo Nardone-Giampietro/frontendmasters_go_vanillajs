@@ -27,7 +27,7 @@ export class MovieDetailsPage extends HTMLElement {
                         <dt>Popularity</dt>
                         <dd>${this.movie.popularity}</dd>
                     `;
-
+        
         const ulGenres = this.querySelector("#genres");
         ulGenres.innerHTML = "";
         this.movie.genres.forEach(genre => {

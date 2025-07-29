@@ -73,7 +73,7 @@ func main() {
 	const address string = ":8080"
 	err = http.ListenAndServe(address, nil)
 	if err != nil {
-		log.Fatalf("Server failed to start: %v", err)
 		logInstance.Error("Server failed to start.", err)
+		log.Fatalf("Server failed to start: %v", err)
 	}
 }

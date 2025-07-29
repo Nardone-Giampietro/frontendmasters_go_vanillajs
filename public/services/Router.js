@@ -1,4 +1,4 @@
-import { routes } from "./Routes.js";
+import {routes} from "./Routes.js";
 
 export const Router = {
     init: () => {
@@ -35,8 +35,7 @@ export const Router = {
                 if (match) {
                     pageElement = new r.component();
                     // Parameters
-                    const params = match.slice(1);
-                    pageElement.params = params;
+                    pageElement.params = match.slice(1);
                     break;
                 }
             }
