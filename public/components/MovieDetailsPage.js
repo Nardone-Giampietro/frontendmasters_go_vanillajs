@@ -7,7 +7,6 @@ export class MovieDetailsPage extends HTMLElement {
         try {
            this.movie = await API.getMovieById(id)
         } catch (e) {
-            alert("ERROR: movied does not exits")
             return;
         }
         const template = document.getElementById("template-movie-details");
@@ -27,7 +26,7 @@ export class MovieDetailsPage extends HTMLElement {
                         <dt>Popularity</dt>
                         <dd>${this.movie.popularity}</dd>
                     `;
-        
+
         const ulGenres = this.querySelector("#genres");
         ulGenres.innerHTML = "";
         this.movie.genres.forEach(genre => {

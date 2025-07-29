@@ -44,7 +44,7 @@ export const Router = {
             pageElement = document.createElement("h1");
             pageElement.textContent = "Page Not Found";
         }
-        // I have a page for the curret URL
+        // I have a page for the current URL
         // Inserting the new page
         document.querySelector("main").innerHTML = "";
         document.querySelector("main").appendChild(pageElement);

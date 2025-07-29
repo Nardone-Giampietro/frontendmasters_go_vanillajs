@@ -48,14 +48,26 @@ func main() {
 		log.Fatalf("Failed to initialize Movie Data Repository: %v", err)
 	}
 
+	// Initialize Account Repository for User
+	accountRepository, err := data.NewAccountRepository(db, logInstance)
+	if err != nil {
+		log.Fatalf("Failed to initialize Account Data Repository: %v", err)
+	}
+
 	// Movie Initializer
 	movieHandlers := handlers.MovieHandler{Storage: movieRepository, Logger: logInstance}
+
+	// User Initializer
+	accountHandler := handlers.NewAccountHandler(accountRepository, logInstance)
 
 	http.HandleFunc("GET /api/movies/top", movieHandlers.GetTopMovies)
 	http.HandleFunc("GET /api/movies/random", movieHandlers.GetRandomMovies)
 	http.HandleFunc("GET /api/movies/search", movieHandlers.SearchMovies)
 	http.HandleFunc("GET /api/movies/", movieHandlers.GetMovie)
 	http.HandleFunc("GET /api/genres/", movieHandlers.GetGenres)
+
+	http.HandleFunc("POST /api/account/register/", accountHandler.Register)
+	http.HandleFunc("POST /api/account/authenticate/", accountHandler.Authenticate)
 
 	catchAllClientRouteshandler := func(w http.ResponseWriter, r *http.Request) {
 		// Si può fare una redirezione oppure inviare index.html
