@@ -1,10 +1,10 @@
-import { HomePage } from "./components/HomePage.js";
 import { API } from "./services/API.js";
-import { MovieDetailsPage } from "./components/MovieDetailsPage.js";
 import './components/YouTubeEmbed.js';
 import './components/AnimatedLoading.js';
 import './components/RegistrationPage.js'
 import { Router } from './services/Router.js';
+import proxiedStore from "./services/Store.js";
+import Store from "./services/Store.js";
 
 window.addEventListener("DOMContentLoaded", (event) => {
     app.Router.init();
@@ -12,6 +12,8 @@ window.addEventListener("DOMContentLoaded", (event) => {
 
 window.app = {
     Router: Router,
+    Store : proxiedStore,
+    api : API,
     showError: (message="There was an error.", goToHome=false) => {
         document.getElementById("alert-modal").showModal();
         document.querySelector("#alert-modal p").textContent = message;
@@ -55,6 +57,7 @@ window.app = {
         if (errors.length === 0){
             const response = await API.register(name, email, password);
             if (response.success) {
+                app.Store.jwt = response.jwt;
                 app.Router.go("/account/");
             } else {
                 app.showError(response.message);
@@ -75,6 +78,7 @@ window.app = {
         if (errors.length === 0){
             const response = await API.login(email, password);
             if (response.success) {
+                app.Store.jwt = response.jwt;
                 app.Router.go("/account/");
             } else {
                 app.showError(response.message);
@@ -83,5 +87,8 @@ window.app = {
             app.showError(errors.join(". "));
         }
     },
-    api : API
+    logout: () => {
+        Store.jwt = null;
+        app.Router.go("/");
+    }
 }

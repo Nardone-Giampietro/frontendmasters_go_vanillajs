@@ -27,7 +27,7 @@ func main() {
 	logInstance := initializeLogger()
 
 	// Env Initializer
-	if err := godotenv.Load(); err != nil {
+	if err := godotenv.Load("/home/nardone/Documents/GitHub/frontendmasters_go_vanillajs/.env"); err != nil {
 		log.Fatalf("No .env file was found.")
 	}
 
