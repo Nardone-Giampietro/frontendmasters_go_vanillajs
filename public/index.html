@@ -16,8 +16,8 @@
         <nav>
             <ul>
                 <li><a class="navlink" href="/">Movies</a></li>
-                <li><a class="navlink" href="/account/favorites">Favorites</a></li>
-                <li><a class="navlink" href="/account/watchlist">Watchlist</a></li>
+                <li><a class="navlink" href="/account/favorites/">Favorites</a></li>
+                <li><a class="navlink" href="/account/watchlist/">Watchlist</a></li>
                 <li><a class="navlink" href="/account/">My Account</a></li>
             </ul>
         </nav>
@@ -56,8 +56,12 @@
                 <section id="actions">
                     <dl id="metadata">
                     </dl>
-                    <button>Add to Favorites</button>
-                    <button>Add to Watchlist</button>    
+                    <button id="add-to-favorites" data-movie-id="" 
+                        onclick="event.preventDefault(); app.addToCollection(event, 'favorite')">
+                        Add to Favorites</button>
+                    <button id="add-to-watchlist" data-movie-id="" 
+                        onclick="event.preventDefault(); app.addToCollection(event, 'watchlist')">
+                        Add to Watchlist</button>    
                 </section>
             </header>
             <ul id="genres"></ul>
@@ -129,8 +133,14 @@
         <section id="account">
             <h2>You are Logged In</h2>
             <button onclick="app.logout(event)">Logout</button>
-            <button onclick="app.Router.go('/account/favorites')">Your Favorites</button>
-            <button onclick="app.Router.go('/account/watchlist')">Your Watchlist</button>
+            <button onclick="app.Router.go('/account/favorites/')">Your Favorites</button>
+            <button onclick="app.Router.go('/account/watchlist/')">Your Watchlist</button>
+        </section>
+    </template>
+    <template id="template-collection">
+        <section id="collection">
+            <h2></h2>
+            <ul id="movies"></ul>
         </section>
     </template>
     <footer>

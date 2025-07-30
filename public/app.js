@@ -41,6 +41,21 @@ window.app = {
         const q = urlParams.get("q") ?? "";
         app.Router.go("/movies?q="  + q + "&order=" + order + "&genre=" + genre);
     },
+    addToCollection: (event, type) => {
+        if (!app.Store.loggedIn) {
+            app.Router.go("/account/");
+            return;
+        }
+        event.preventDefault();
+        const movieId = event.target.dataset.movieId;
+        app.api.saveToCollection(movieId, type);
+        if (type === "favorite") {
+            event.target.textContent = "Added to Favorites";
+        } else if (type === "watchlist") {
+            event.target.textContent = "Added to Watchlist";
+        }
+        event.target.disabled = true;
+    },
     register: async (event) => {
         event.preventDefault();
         const name = document.getElementById("register-name").value;

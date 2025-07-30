@@ -26,7 +26,8 @@ export class MovieDetailsPage extends HTMLElement {
                         <dt>Popularity</dt>
                         <dd>${this.movie.popularity}</dd>
                     `;
-
+        this.querySelector("#add-to-favorites").setAttribute("data-movie-id", id);
+        this.querySelector("#add-to-watchlist").setAttribute("data-movie-id", id);
         const ulGenres = this.querySelector("#genres");
         ulGenres.innerHTML = "";
         this.movie.genres.forEach(genre => {

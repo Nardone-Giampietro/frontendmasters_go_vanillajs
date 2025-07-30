@@ -1,12 +1,15 @@
 package handlers
 
 import (
-	_ "context"
+	"context"
 	"encoding/json"
+	"net/http"
+	"strings"
+	_ "strings"
+
+	"github.com/golang-jwt/jwt/v5"
 	"nardone.xyz/frontendmasters/go-vanillajs/models"
 	"nardone.xyz/frontendmasters/go-vanillajs/token"
-	"net/http"
-	_ "strings"
 
 	"nardone.xyz/frontendmasters/go-vanillajs/data"
 	"nardone.xyz/frontendmasters/go-vanillajs/logger"
@@ -129,4 +132,121 @@ func NewAccountHandler(storage data.AccountStorage, log *logger.Logger) *Account
 		storage: storage,
 		logger:  log,
 	}
+}
+
+func (h *AccountHandler) SaveToCollection(w http.ResponseWriter, r *http.Request) {
+	type CollectionRequest struct {
+		MovieID    int    `json:"movie_id"`
+		Collection string `json:"collection"`
+	}
+
+	var req CollectionRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		h.logger.Error("Failed to decode collection request", err)
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+	email, ok := r.Context().Value("email").(string)
+	if !ok {
+		http.Error(w, "Unable to retrieve email", http.StatusInternalServerError)
+		return
+	}
+
+	success, err := h.storage.SaveCollection(models.User{Email: email},
+		req.MovieID, req.Collection)
+	if h.handleStorageError(w, err, "Failed to save to collection") {
+		return
+	}
+
+	response := AuthResponse{
+		Success: success,
+		Message: "Movie added to " + req.Collection + " successfully",
+	}
+
+	if err := h.writeJSONResponse(w, response); err == nil {
+		h.logger.Info("Successfully saved movie to " + req.Collection)
+	}
+}
+
+func (h *AccountHandler) GetFavorites(w http.ResponseWriter, r *http.Request) {
+	email, ok := r.Context().Value("email").(string)
+	if !ok {
+		http.Error(w, "Unable to retrieve email", http.StatusInternalServerError)
+		return
+	}
+	details, err := h.storage.GetAccountDetails(email)
+	if err != nil {
+		http.Error(w, "Unable to retrieve collections", http.StatusInternalServerError)
+		return
+	}
+	if err := h.writeJSONResponse(w, details.Favorites); err == nil {
+		h.logger.Info("Successfully sent favorites")
+	}
+}
+
+func (h *AccountHandler) GetWatchlist(w http.ResponseWriter, r *http.Request) {
+	email, ok := r.Context().Value("email").(string)
+	if !ok {
+		http.Error(w, "Unable to retrieve email", http.StatusInternalServerError)
+		return
+	}
+	details, err := h.storage.GetAccountDetails(email)
+	if err != nil {
+		http.Error(w, "Unable to retrieve collections", http.StatusInternalServerError)
+		return
+	}
+	if err := h.writeJSONResponse(w, details.Watchlist); err == nil {
+		h.logger.Info("Successfully sent favorites")
+	}
+}
+
+func (h *AccountHandler) AuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		tokenString := r.Header.Get("Authorization")
+		if tokenString == "" {
+			http.Error(w, "Missing authorization token", http.StatusUnauthorized)
+			return
+		}
+
+		// Remove the "Bearer " prefix
+		tokenString = strings.TrimPrefix(tokenString, "Bearer ")
+		if tokenString == "" {
+			http.Error(w, "Invalid authorization token", http.StatusUnauthorized)
+			return
+		}
+
+		// Parse the token
+		token_, err := jwt.Parse(tokenString, func(t *jwt.Token) (interface{}, error) {
+			if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
+				return nil, jwt.ErrSignatureInvalid
+			}
+			return []byte(token.GetJWTSecret(*h.logger)), nil
+		})
+
+		// Check if the token is valid
+		if err != nil || !token_.Valid {
+			http.Error(w, "Invalid authorization token", http.StatusUnauthorized)
+			return
+		}
+
+		// Get the claims
+		claims, ok := token_.Claims.(jwt.MapClaims)
+		if !ok {
+			http.Error(w, "Invalid authorization token", http.StatusUnauthorized)
+			return
+		}
+
+		// Get the email from the claims
+		email, ok := claims["email"].(string)
+		if !ok {
+			http.Error(w, "Email not found in token", http.StatusUnauthorized)
+			return
+		}
+
+		// Add the email to the context
+		context := context.WithValue(r.Context(), "email", email)
+
+		// Serve the request
+		next.ServeHTTP(w, r.WithContext(context))
+	})
 }

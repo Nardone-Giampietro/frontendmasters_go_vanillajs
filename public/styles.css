@@ -336,6 +336,11 @@ button:hover {
     opacity: 0.9;
 }
 
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
 
 /* Movie Details */
 #movie h3 {
