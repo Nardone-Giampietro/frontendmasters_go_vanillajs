@@ -8,7 +8,7 @@ export class CollectionPage extends HTMLElement {
     }
 
     async render() {
-        const movies = await this.endpoint();
+        const movies = (await this.endpoint()).data;
         const ul = this.querySelector("ul");
         const h2 = this.querySelector("h2");
         ul.innerHTML = "";
@@ -19,7 +19,7 @@ export class CollectionPage extends HTMLElement {
             h2.textContent = this.title;
             movies.forEach(movie => {
                 const li = document.createElement("li");
-                li.appendChild(new MovieItem(movie));
+                li.appendChild(new MovieItem(movie, this.title));
                 ul.appendChild(li);
             });
         }

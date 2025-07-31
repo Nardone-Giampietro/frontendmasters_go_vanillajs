@@ -68,9 +68,11 @@ func main() {
 
 	http.HandleFunc("POST /api/account/register/", accountHandler.Register)
 	http.HandleFunc("POST /api/account/authenticate/", accountHandler.Authenticate)
+	http.Handle("POST /api/account/delete/",
+		accountHandler.AuthMiddleware(http.HandlerFunc(accountHandler.DeleteAccount)))
 
 	// Favorites endpoints
-	http.Handle("GET /api/account/favorites/",
+	http.Handle("GET /api/account/favorite/",
 		accountHandler.AuthMiddleware(http.HandlerFunc(accountHandler.GetFavorites)))
 	// Watchlist endpoints
 	http.Handle("GET /api/account/watchlist/",
@@ -78,6 +80,9 @@ func main() {
 	// Save to collection endpoints
 	http.Handle("POST /api/account/save-to-collection/",
 		accountHandler.AuthMiddleware(http.HandlerFunc(accountHandler.SaveToCollection)))
+	// Remove from collection endpoints
+	http.Handle("POST /api/account/delete-from-collection/",
+		accountHandler.AuthMiddleware(http.HandlerFunc(accountHandler.RemoveFromCollection)))
 
 	catchAllClientRouteshandler := func(w http.ResponseWriter, r *http.Request) {
 		// Si può fare una redirezione oppure inviare index.html

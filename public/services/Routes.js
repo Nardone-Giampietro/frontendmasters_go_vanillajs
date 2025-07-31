@@ -34,7 +34,7 @@ export const routes = [
         loggedIn: true
     },
     {
-        path: "/account/favorites/",
+        path: "/account/favorite/",
         component: FavoritesPage,
         loggedIn: true
     },

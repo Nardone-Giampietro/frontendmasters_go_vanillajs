@@ -23,6 +23,31 @@ func NewAccountRepository(db *sql.DB, log *logger.Logger) (*AccountRepository, e
 	}, nil
 }
 
+func (r *AccountRepository) DeleteAccount(email string) (bool, error) {
+
+	// Check if user exists
+	var exists bool
+	err := r.db.QueryRow(`
+		SELECT 1 FROM accounts WHERE email = $1
+		`, email).Scan(&exists)
+	if errors.Is(err, sql.ErrNoRows) {
+		r.logger.Error("User not found for email: "+email, nil)
+		return false, ErrUserNotFound
+	}
+
+	// Delete the user
+	_, err = r.db.Exec(`
+		DELETE FROM users WHERE email = $1
+		`, email)
+	if err != nil {
+		r.logger.Error("Failed to delete user", err)
+		return false, err
+	}
+
+	return true, nil
+
+}
+
 func (r *AccountRepository) Register(name, email, password string) (bool, error) {
 	// Validate basic requirements
 	// TODO : Add more validation
@@ -118,7 +143,7 @@ func (r *AccountRepository) Authenticate(email string, password string) (bool, e
 	_, err = r.db.Exec(updateQuery, time.Now(), user.ID)
 	if err != nil {
 		r.logger.Error("Failed to update last login", err)
-		// Don't fail authentication just because last login update failed
+		return false, err
 	}
 
 	return true, nil
@@ -265,6 +290,48 @@ func (r *AccountRepository) SaveCollection(user models.User, movieID int, collec
 	}
 
 	r.logger.Info("Successfully added movie " + string(movieID) + " to " + collection + " for user")
+	return true, nil
+}
+
+func (r *AccountRepository) RemoveFromCollection(user models.User, movieID int, collection string) (bool, error) {
+	// Validate inputs
+	if movieID <= 0 {
+		r.logger.Error("RemoveFromCollection failed: invalid movie ID", nil)
+		return false, errors.New("invalid movie ID")
+	}
+	if collection != "favorite" && collection != "watchlist" {
+		r.logger.Error("RemoveFromCollection failed: invalid collection type", nil)
+		return false, errors.New("Collection must be 'favorite' or 'watchlist'")
+	}
+
+	// Get user ID from email
+	var userID int
+	err := r.db.QueryRow(`
+		SELECT id 
+		FROM users 
+		WHERE email = $1 AND time_deleted IS NULL
+	`, user.Email).Scan(&userID)
+	if errors.Is(err, sql.ErrNoRows) {
+		r.logger.Error("User not found", nil)
+		return false, ErrUserNotFound
+	}
+	if err != nil {
+		r.logger.Error("Failed to query user ID", err)
+		return false, err
+	}
+
+	// Delete che movie from the collection
+	query := `
+		DELETE FROM user_movies
+		WHERE user_id = $1 
+			AND movie_id = $2
+			AND relation_type = $3
+	`
+	_, err = r.db.Exec(query, userID, movieID, collection)
+	if err != nil {
+		r.logger.Error("Failed to remove from collection "+collection, err)
+		return false, err
+	}
 	return true, nil
 }
 

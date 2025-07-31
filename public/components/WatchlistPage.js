@@ -3,7 +3,7 @@ import { CollectionPage } from "./CollectionPage.js";
 
 export class WatchlistPage extends CollectionPage {
     constructor() {
-        super(API.getWatchlist, "Watchlist");
+        super(API.getWatchlist, "watchlist");
     }
 }
 

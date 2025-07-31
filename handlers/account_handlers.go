@@ -34,6 +34,11 @@ type AuthResponse struct {
 	JWT     string `json:"jwt"`
 }
 
+type CollectionRequest struct {
+	MovieID    int    `json:"movie_id"`
+	Collection string `json:"collection"`
+}
+
 type AccountHandler struct {
 	storage data.AccountStorage
 	logger  *logger.Logger
@@ -127,6 +132,28 @@ func (h *AccountHandler) Authenticate(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (h *AccountHandler) DeleteAccount(w http.ResponseWriter, r *http.Request) {
+	email, ok := r.Context().Value("email").(string)
+	if !ok {
+		http.Error(w, "Unable to retrieve email", http.StatusInternalServerError)
+		return
+	}
+
+	success, err := h.storage.DeleteAccount(email)
+	if h.handleStorageError(w, err, "Failed to delete user") {
+		return
+	}
+
+	response := AuthResponse{
+		Success: success,
+		Message: "User deleted successfully",
+	}
+
+	if err := h.writeJSONResponse(w, response); err == nil {
+		h.logger.Info("Successfully deleted user with email: " + email)
+	}
+}
+
 func NewAccountHandler(storage data.AccountStorage, log *logger.Logger) *AccountHandler {
 	return &AccountHandler{
 		storage: storage,
@@ -135,10 +162,6 @@ func NewAccountHandler(storage data.AccountStorage, log *logger.Logger) *Account
 }
 
 func (h *AccountHandler) SaveToCollection(w http.ResponseWriter, r *http.Request) {
-	type CollectionRequest struct {
-		MovieID    int    `json:"movie_id"`
-		Collection string `json:"collection"`
-	}
 
 	var req CollectionRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -146,6 +169,7 @@ func (h *AccountHandler) SaveToCollection(w http.ResponseWriter, r *http.Request
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
+
 	email, ok := r.Context().Value("email").(string)
 	if !ok {
 		http.Error(w, "Unable to retrieve email", http.StatusInternalServerError)
@@ -166,6 +190,38 @@ func (h *AccountHandler) SaveToCollection(w http.ResponseWriter, r *http.Request
 	if err := h.writeJSONResponse(w, response); err == nil {
 		h.logger.Info("Successfully saved movie to " + req.Collection)
 	}
+}
+
+func (h *AccountHandler) RemoveFromCollection(w http.ResponseWriter, r *http.Request) {
+
+	var req CollectionRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		h.logger.Error("Failed to decode collection request", err)
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+
+	email, ok := r.Context().Value("email").(string)
+	if !ok {
+		http.Error(w, "Unable to retrieve email", http.StatusInternalServerError)
+		return
+	}
+
+	success, err := h.storage.RemoveFromCollection(models.User{Email: email},
+		req.MovieID, req.Collection)
+	if h.handleStorageError(w, err, "Failed to remove from collection") {
+		return
+	}
+
+	response := AuthResponse{
+		Success: success,
+		Message: "Movie removed from " + req.Collection + " successfully",
+	}
+
+	if err := h.writeJSONResponse(w, response); err == nil {
+		h.logger.Info("Successfully removed movie from " + req.Collection)
+	}
+
 }
 
 func (h *AccountHandler) GetFavorites(w http.ResponseWriter, r *http.Request) {

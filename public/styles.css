@@ -341,6 +341,12 @@ button:disabled {
     cursor: not-allowed;
 }
 
+button .delete-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    z-index: 1;
+}
 
 /* Movie Details */
 #movie h3 {

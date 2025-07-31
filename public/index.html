@@ -16,7 +16,7 @@
         <nav>
             <ul>
                 <li><a class="navlink" href="/">Movies</a></li>
-                <li><a class="navlink" href="/account/favorites/">Favorites</a></li>
+                <li><a class="navlink" href="/account/favorite/">Favorites</a></li>
                 <li><a class="navlink" href="/account/watchlist/">Watchlist</a></li>
                 <li><a class="navlink" href="/account/">My Account</a></li>
             </ul>
@@ -133,8 +133,9 @@
         <section id="account">
             <h2>You are Logged In</h2>
             <button onclick="app.logout(event)">Logout</button>
-            <button onclick="app.Router.go('/account/favorites/')">Your Favorites</button>
+            <button onclick="app.Router.go('/account/favorite/')">Your Favorites</button>
             <button onclick="app.Router.go('/account/watchlist/')">Your Watchlist</button>
+            <button onclick="app.deleteAccount(event)">Delete Account</button>
         </section>
     </template>
     <template id="template-collection">
