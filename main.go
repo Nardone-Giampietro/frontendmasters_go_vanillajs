@@ -64,7 +64,9 @@ func main() {
 	http.HandleFunc("GET /api/movies/random", movieHandlers.GetRandomMovies)
 	http.HandleFunc("GET /api/movies/search", movieHandlers.SearchMovies)
 	http.HandleFunc("GET /api/movies/", movieHandlers.GetMovie)
+	http.HandleFunc("GET /api/actors/", movieHandlers.GetActorById)
 	http.HandleFunc("GET /api/genres/", movieHandlers.GetGenres)
+	http.HandleFunc("GET /api/movies/actor/", movieHandlers.GetMoviesByActorId)
 
 	http.HandleFunc("POST /api/account/register/", accountHandler.Register)
 	http.HandleFunc("POST /api/account/authenticate/", accountHandler.Authenticate)
@@ -92,6 +94,7 @@ func main() {
 	}
 	http.HandleFunc("/movies", catchAllClientRouteshandler)
 	http.HandleFunc("/movies/", catchAllClientRouteshandler)
+	http.HandleFunc("/actor/", catchAllClientRouteshandler)
 	http.HandleFunc("/account/", catchAllClientRouteshandler)
 
 	// Server the static folder public

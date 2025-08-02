@@ -2,8 +2,8 @@ export class AccountPage extends HTMLElement {
 
     connectedCallback(){
         const template = document.getElementById("template-account");
-        const content = template.content.cloneNode(true);
-        this.appendChild(content);
+        const clone = template.content.cloneNode(true);
+        this.appendChild(clone);
     }
 
 }

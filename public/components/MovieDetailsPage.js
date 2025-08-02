@@ -39,13 +39,17 @@ export class MovieDetailsPage extends HTMLElement {
         const ulCast = this.querySelector("#cast");
         ulCast.innerHTML = "";
         this.movie.casting.forEach(actor => {
-            const li = document.createElement("li");
-            li.innerHTML = `
-                <img src="${actor.image_url ?? '/images/generic_actor.jpg'}"
-                    alt="Picture of ${actor.last_name}">
-                <p>${actor.first_name} ${actor.last_name}</p>
+            const a = document.createElement("a");
+            a.innerHTML = `
+                <li>
+                    <img src="${actor.image_url ?? '/images/generic_actor.jpg'}"
+                        alt="Picture of ${actor.last_name}">
+                    <p>${actor.first_name} ${actor.last_name}</p>    
+                </li>
             `;
-            ulCast.appendChild(li);
+            a.setAttribute("onclick", `event.preventDefault(); app.Router.go('/actor/${actor.id}')`);
+            a.setAttribute("href", "#");
+            ulCast.appendChild(a);
         });
 
     }

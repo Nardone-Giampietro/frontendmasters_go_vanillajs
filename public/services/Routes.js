@@ -6,6 +6,7 @@ import { LoginPage } from "../components/LoginPage.js";
 import { AccountPage } from "../components/AccountPage.js";
 import { FavoritesPage } from "../components/FavoritesPage.js";
 import { WatchlistPage } from "../components/WatchlistPage.js";
+import { ActorDetailsPage } from "../components/ActorDetailsPage.js";
 
 export const routes = [
     {
@@ -15,6 +16,10 @@ export const routes = [
     {
         path: /\/movies\/(\d+)/,
         component: MovieDetailsPage
+    },
+    {
+        path: /\/actor\/(\d+)/,
+        component: ActorDetailsPage
     },
     {
         path: "/movies", // search result

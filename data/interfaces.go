@@ -6,8 +6,10 @@ type MovieStorage interface {
 	GetTopMovies() ([]models.Movie, error)
 	GetRandomMovies() ([]models.Movie, error)
 	GetMovieById(id int) (models.Movie, error)
+	GetMoviesByActorId(actorId int) ([]models.Movie, error)
 	SearchMoviesByName(name string, oder string, genre *int) ([]models.Movie, error)
 	GetAllGenres() ([]models.Genre, error)
+	GetActorById(actorId int) (models.Actor, error)
 }
 
 type AccountStorage interface {

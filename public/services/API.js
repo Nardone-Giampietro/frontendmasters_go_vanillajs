@@ -63,6 +63,12 @@ export const API = {
     getMovieById: async (id) => {
         return await API.request(`movies/${id}`, { method: "GET" });
     },
+    getActorById: async (actorId) => {
+        return await API.request(`actors/${actorId}`, { method: "GET" });
+    },
+    getMoviesByActorId: async (actorId) => {
+        return await API.request(`movies/actor/${actorId}`, { method: "GET" });
+    },
     searchMovies: async(q, order, genre) => {
         return await API.request("movies/search", { method: "GET", args: { q, order, genre } });
     },

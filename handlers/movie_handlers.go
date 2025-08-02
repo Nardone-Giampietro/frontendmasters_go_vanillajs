@@ -40,6 +40,28 @@ func (h *MovieHandler) handleStorageError(w http.ResponseWriter, err error, cont
 	return false
 }
 
+func (h *MovieHandler) GetActorById(w http.ResponseWriter, r *http.Request) {
+	idStr := r.URL.Path[len("/api/actors/"):]
+	var id int
+	if idStr != "" {
+		actInt, ok := h.parseID(w, idStr)
+		if !ok {
+			return
+		}
+		id = actInt
+	}
+
+	actor, err := h.Storage.GetActorById(id)
+
+	if h.handleStorageError(w, err, "Failed to get movies") {
+		return
+	}
+	if h.writeJSONResponse(w, actor) == nil {
+		h.Logger.Info("Successfully served movies")
+	}
+
+}
+
 func (h *MovieHandler) parseID(w http.ResponseWriter, idStr string) (int, bool) {
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
@@ -111,6 +133,26 @@ func (h *MovieHandler) GetMovie(w http.ResponseWriter, r *http.Request) {
 	}
 	if h.writeJSONResponse(w, movie) == nil {
 		h.Logger.Info("Successfully served movie with ID: " + idStr)
+	}
+}
+
+func (h *MovieHandler) GetMoviesByActorId(w http.ResponseWriter, r *http.Request) {
+	idStr := r.URL.Path[len("/api/movies/actor/"):]
+	var id int
+	if idStr != "" {
+		movieInt, ok := h.parseID(w, idStr)
+		if !ok {
+			return
+		}
+		id = movieInt
+	}
+
+	movies, err := h.Storage.GetMoviesByActorId(id)
+	if h.handleStorageError(w, err, "Failed to get movies bu actor by ID") {
+		return
+	}
+	if h.writeJSONResponse(w, movies) == nil {
+		h.Logger.Info("Successfully served movies by actor ID")
 	}
 }
 
