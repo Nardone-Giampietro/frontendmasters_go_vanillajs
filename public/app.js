@@ -5,6 +5,7 @@ import './components/RegistrationPage.js'
 import { Router } from './services/Router.js';
 import proxiedStore from "./services/Store.js";
 import Store from "./services/Store.js";
+import {Passkeys} from "./services/Passkeys.js";
 
 window.addEventListener("DOMContentLoaded", (event) => {
     app.Router.init();
@@ -182,5 +183,18 @@ window.app = {
     logout: () => {
         Store.jwt = null;
         app.Router.go("/");
+    },
+    addLoginWithPasskey : async (event) => {
+        const username = document.getElementById("login-email").value;
+        if (username.length < 4) {
+            app.showError("To use a passkey, enter your email address first")
+        } else {
+            await Passkeys.authenticate(username);
+        }
+    },
+    addNewPasskey: async (event) => {
+        const username = "testuser";
+        await Passkeys.register(username);
     }
 }
+

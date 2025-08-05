@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"github.com/go-webauthn/webauthn/webauthn"
 	"log"
 	"net/http"
 	"os"
@@ -85,6 +86,36 @@ func main() {
 	// Remove from collection endpoints
 	http.Handle("POST /api/account/delete-from-collection/",
 		accountHandler.AuthMiddleware(http.HandlerFunc(accountHandler.RemoveFromCollection)))
+
+	// Web Authentication - Passkeys
+	// WebAuthn Handlers
+	config := &webauthn.Config{
+		RPDisplayName: "ReelingIt",
+		RPID:          "localhost",
+		RPOrigins:     []string{"http://localhost:8080"}, // si può usare una collezione di origins
+	}
+
+	var webAuthnManager *webauthn.WebAuthn
+
+	if webAuthnManager, err = webauthn.New(config); err != nil {
+		logInstance.Error("Error creating WebAuthn", err)
+	}
+
+	if err != nil {
+		logInstance.Error("Error initialing Passkey engine", err)
+	}
+
+	passkeyRepo := data.NewPasskeyRepository(db, *logInstance)
+	webAuthnHandler := handlers.NewWebAuthnHandler(passkeyRepo, logInstance, webAuthnManager)
+
+	// Needs User Authentication (for passkey registration)
+	http.Handle("/api/passkey/registration-begin",
+		accountHandler.AuthMiddleware(http.HandlerFunc(webAuthnHandler.WebAuthnRegistrationBeginHandler)))
+	http.Handle("/api/passkey/registration-end",
+		accountHandler.AuthMiddleware(http.HandlerFunc(webAuthnHandler.WebAuthnRegistrationEndHandler)))
+	// No need for User Authentication
+	http.HandleFunc("/api/passkey/authentication-begin", webAuthnHandler.WebAuthnAuthenticationBeginHandler)
+	http.HandleFunc("/api/passkey/authentication-end", webAuthnHandler.WebAuthnAuthenticationEndHandler)
 
 	catchAllClientRouteshandler := func(w http.ResponseWriter, r *http.Request) {
 		// Si può fare una redirezione oppure inviare index.html

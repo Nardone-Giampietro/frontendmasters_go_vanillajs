@@ -1,6 +1,9 @@
 package data
 
-import "nardone.xyz/frontendmasters/go-vanillajs/models"
+import (
+	"github.com/go-webauthn/webauthn/webauthn"
+	"nardone.xyz/frontendmasters/go-vanillajs/models"
+)
 
 type MovieStorage interface {
 	GetTopMovies() ([]models.Movie, error)
@@ -19,4 +22,15 @@ type AccountStorage interface {
 	GetAccountDetails(string) (models.User, error)
 	SaveCollection(models.User, int, string) (bool, error)
 	RemoveFromCollection(models.User, int, string) (bool, error)
+}
+
+type PasskeyStore interface {
+	GetUserByEmail(userName string) (*models.PasskeyUser, error)
+	GetUserByID(ID int) (*models.PasskeyUser, error)
+	SaveUser(models.PasskeyUser)
+	// Session management that is useful for storing the state of the client while it is doing the challenge.
+	GenSessionID() (string, error)
+	GetSession(token string) (webauthn.SessionData, bool)
+	SaveSession(token string, data webauthn.SessionData)
+	DeleteSession(token string)
 }

@@ -8,7 +8,7 @@ export class MoviesPage extends HTMLElement {
         const order = urlParams.get("order") ?? "";
         const genre = urlParams.get("genre") ?? "";
 
-        const movies = await API.searchMovies(query, order, genre);
+        const movies = (await API.searchMovies(query, order, genre)).data;
 
         const ulMovies = this.querySelector("ul");
         ulMovies.innerHTML = "";
@@ -30,7 +30,7 @@ export class MoviesPage extends HTMLElement {
     }
 
     async loadGenres() {
-        const genres = await API.getGenres();
+        const genres = (await API.getGenres()).data;
         const select = this.querySelector("select#filter");
         select.innerHTML = `
             <option value="" >Filter by Genre</option>
