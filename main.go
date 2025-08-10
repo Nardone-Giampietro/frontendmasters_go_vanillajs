@@ -15,17 +15,17 @@ import (
 )
 
 func initializeLogger() *logger.Logger {
-	logInstance, err := logger.NewLogger("movie.log")
-	if err != nil {
-		log.Fatalf("Failed to initialize logger %v", err)
-	}
-	defer logInstance.Close()
-	return logInstance
+        logInstance, err := logger.NewLogger("movie.log")
+        if err != nil {
+                log.Fatalf("Failed to initialize logger %v", err)
+        }
+        return logInstance
 }
 
 func main() {
-	// log Initializer
+        // log Initializer
 	logInstance := initializeLogger()
+	defer logInstance.Close()
 
 	// Env Initializer
 	if err := godotenv.Load("/home/nardone/Documents/GitHub/frontendmasters_go_vanillajs/.env"); err != nil {
